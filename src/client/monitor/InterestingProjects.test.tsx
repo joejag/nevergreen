@@ -5,6 +5,8 @@ import {buildProject, buildProjectError, buildTray, render, setSystemTime} from 
 import {Prognosis, ProjectPrognosis} from '../domain/Project'
 import {TRAYS_ROOT} from '../tracking/TraysReducer'
 import {MaxProjectsToShow, SETTINGS_ROOT} from '../settings/SettingsReducer'
+import * as SfxHook from './SfxHook'
+import {waitFor} from '@testing-library/react'
 
 const trayId = 'some-tray-id'
 
@@ -15,9 +17,20 @@ beforeAll(() => {
   window.HTMLMediaElement.prototype.pause = noop
 })
 
+// beforeEach(() => {
+//   const play = jest.fn()
+//   jest.spyOn(SfxHook, 'createAudio').mockReturnValue({
+//     play
+//   } as unknown as HTMLAudioElement)
+// })
+
 describe('broken build sfx', () => {
 
-  it('should play if its enabled and any project is broken', () => {
+  it.only('should play if its enabled and any project is broken', async () => {
+    const play = jest.fn()
+    jest.spyOn(SfxHook, 'createAudio').mockReturnValue({
+      play
+    } as unknown as HTMLAudioElement)
     const state = {
       [TRAYS_ROOT]: {
         [trayId]: buildTray({trayId})
@@ -32,8 +45,10 @@ describe('broken build sfx', () => {
         buildProject({trayId, prognosis: Prognosis.sick})
       ]
     }
-    const {getByTestId} = render(<InterestingProjects {...props}/>, state)
-    expect(getByTestId('broken-build-sound')).toHaveAttribute('src', 'some-sfx')
+    render(<InterestingProjects {...props}/>, state)
+    await waitFor(() => {
+      expect(play).toHaveBeenCalled()
+    })
   })
 
   it('should not play if its off even if any project is sick', () => {

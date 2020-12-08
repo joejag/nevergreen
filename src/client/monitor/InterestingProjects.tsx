@@ -10,6 +10,7 @@ import {getMaxProjectsToShow, MaxProjectsToShow} from '../settings/SettingsReduc
 import {BrokenBuildSfx} from './BrokenBuildSfx'
 import {isMobile, isTablet} from '../common/Style'
 import {useWindowResized} from '../common/ResizableHook'
+import {useSoundEffect} from './SfxHook'
 
 interface InterestingProjectsProps {
   readonly projects: Projects;
@@ -74,6 +75,8 @@ export function InterestingProjects({projects}: InterestingProjectsProps): React
   const summary = !isEmpty(projectsNotShown) && (
     <TileProjectsNotShown key='summary' projectsNotShown={projectsNotShown}/>
   )
+
+  useSoundEffect(projects)
 
   return (
     <div className={styles.interestingProjects}
