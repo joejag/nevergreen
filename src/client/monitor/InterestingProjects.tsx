@@ -87,7 +87,6 @@ export function InterestingProjects({projects}: InterestingProjectsProps): React
         {projectComponents}
         {summary}
       </ScaledGrid>
-      <BrokenBuildSfx projects={projects}/>
     </div>
   )
 }

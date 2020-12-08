@@ -13,19 +13,16 @@ beforeAll(() => {
   // eslint-disable-next-line @typescript-eslint/unbound-method
   // noinspection JSUnusedGlobalSymbols
   window.HTMLMediaElement.prototype.pause = noop
+  // eslint-disable-next-line @typescript-eslint/unbound-method
+  // noinspection JSUnusedGlobalSymbols
+  window.HTMLMediaElement.prototype.play = () => Promise.resolve()
 })
-
-// beforeEach(() => {
-//   const play = jest.fn()
-//   jest.spyOn(SfxHook, 'createAudio').mockReturnValue({
-//     play
-//   } as unknown as HTMLAudioElement)
-// })
 
 describe('broken build sfx', () => {
 
   it('should play if its enabled and any project is broken', () => {
     jest.spyOn(window.HTMLMediaElement.prototype, 'play').mockResolvedValue()
+    jest.spyOn(window.HTMLMediaElement.prototype, 'pause').mockReturnValue()
     const state = {
       [TRAYS_ROOT]: {
         [trayId]: buildTray({trayId})
@@ -40,10 +37,15 @@ describe('broken build sfx', () => {
         buildProject({trayId, prognosis: Prognosis.sick})
       ]
     }
-    render(<InterestingProjects {...props}/>, state)
+    const {unmount} = render(<InterestingProjects {...props}/>, state)
 
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(window.HTMLMediaElement.prototype.play).toHaveBeenCalled()
+
+    unmount()
+
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    expect(window.HTMLMediaElement.prototype.pause).toHaveBeenCalled()
   })
 
   it('should not play if its off even if any project is sick', () => {
