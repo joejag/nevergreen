@@ -13,14 +13,12 @@ export function useSoundEffect(projects: Projects): void {
   const brokenBuildFx = useSelector(getBrokenBuildSoundFx)
 
   useEffect(() => {
-    const sfx = createAudio()
-    // return () => {
-    //   if (sfx) {
-    //     sfx.pause()
-    //   }
-    // }
-    void sfx.play()
-  }, [])
+    const projectIsBroken = projects.some((project) => isError(project) || isSick(project))
+    const playBrokenSfx = playBrokenBuildSounds && !isBlank(brokenBuildFx) && projectIsBroken
+    if (playBrokenSfx) {
+      void new Audio(brokenBuildFx).play()
+    }
+  }, [projects, playBrokenBuildSounds, brokenBuildFx])
 }
 
 export function BrokenBuildSfx({projects}: BrokenBuildSfxProps): ReactElement | null {
